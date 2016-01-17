@@ -47,7 +47,7 @@ L'interface _web_ devrait pouvoir:
 
 3.  Modifier la liste d'adresse `etat.yp`
 
-Chaque group (de 4 à 6 personnes) devrait produire un document
+Chaque groupe (de 4 à 6 personnes) devrait produire un document
 `courriel.html` accompagné par des documents `*.css` et `*.js`. L'état
 initial (la valeur de la variable `etat`) devrait se trouver dans votre
 code javascript.

@@ -1,0 +1,48 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<h1>Mini-serveur HTTP, <tt>couriel</tt>, pour le partage de messages</h1>
+<h2>Description</h2>
+<p>Concevoir et implémenter un simple serveur de partage de messages
+  chifrés avec la cryptographie asymetrique RSA.</p>
+<p>Ce projet comporte plusieurs parties:</p>
+<ol>
+  <li>Description du système du point de vue de fonctionnalité (spécification fonctionnelle):
+    <ul>
+      <li>définir ce qui est possible à faire: "créer un nouveau
+        message", "chercher les messages des autres pairs", "ajouter
+        un nouveau contact", etc...</li>
+      <li>créer un modèle pour le stockage des messages: "base de
+      donnée", "système de fichiers", etc...</li>
+  </ul></li>
+  <li>Réalisation du serveur HTTP coté client web qui va gérer
+    l'interaction avec l'utilisateur :
+    <ul>
+      <li>implémenter le serveur HTTP (en javascript côté serveur:
+        "nodejs" et "express")</li>
+      <li>faire le re-design de la page web du devoir 1 (http, css,
+        javascript) pour l'adopter au serveur</li>
+  </ul></li>
+  <li>Définition d'un protocole de communication entre les pairs (peers)
+    qui permettra l'échange (synchronisation) de messages locaux entre eux</li>
+  <li>Réalisation du serveur HTTP coté "pair"</li>
+  <li>Considérations sur la sécurité</li>
+  <ul>
+    <li>Pour des raisons de confidentialité, votre système va utiliser
+      le chiffrement asymetrique RSA pour chiffrer et déchiffrer les
+      messages</li>
+  </ul>
+</ol>
+<h2>Évaluation</h2>
+<p>L'évaluation du travail porte sur:</p>
+<ol>
+  <li>spécification fonctionnelle (10%)</li>
+<li>qualité de l'interface (40%)</li>
+<li>qualité du code serveur (40%)</li>
+<li>analyse de la sécurité (10%)</li>
+</ol>
+<h3>Remarque</h3>
+<p>Le travail en groupes (de 4 à 8) est conseillé mais pas garant d'une meilleure note!</p>
+</body>

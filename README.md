@@ -53,3 +53,16 @@ initial (la valeur de la variable `etat`) devrait se trouver dans votre
 code javascript.
 
 ## __Projet 2__: Un mini-serveur
+
+Le rôle de `mini-serveur` est:
+
+1. d'initialiser, de maintenir, et de servir à l'interface graphique
+la valeur de l'`etat`;
+
+2. d'échanger avec les pairs les messages de `etat.outbox`;
+
+3. de chiffrer et déchiffrer les messages en utilisant la
+cryptographie asymétrique (RSA), pour garantir la confidentialité.
+
+
+

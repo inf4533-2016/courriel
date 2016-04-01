@@ -1,0 +1,25 @@
+html
+  head
+    meta(charset="utf8")
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js")
+  body
+    h1 Hi #{prenom}
+    p
+      | Voici mon paragraphe ...
+      | Mon nom est #{nom}
+    div
+      textarea(id="textarea")
+      button(id="button")
+        | Envoyer la requette
+      script.
+        $("#button").click(function(){
+          var m = 
+          $.ajax({
+            url: "post",
+            contentType: "application/json",
+            data: JSON.stringify({msg: $("#textarea").val()}),
+            method: "POST"
+          }).done(function(d) {
+            alert(JSON.stringify(d));
+          });
+        });

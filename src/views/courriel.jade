@@ -3,11 +3,14 @@ html
   head
     title Courriel
     link(rel='stylesheet', href='/css/style.css')
-    script var encryptedKey = '#{encryptedKey}';
   body
     div.header(id='header')
+      select(id="focus")
+        option(value="inbox") Inbox
+        option(value="write") New message
+        option(value="yp") Address Book
     div.body(id='body')
-    div.footer(id='footer')
+
     script(src='/js/courriel.js')
 
 

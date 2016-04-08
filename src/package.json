@@ -16,6 +16,7 @@
     "express": "^4.13.4",
     "jade": "^1.11.0",
     "jquery": "^2.2.2",
+    "json-file-object": "^1.1.0",
     "lodash": "^4.8.2",
     "node-rsa": "^0.3.2",
     "superagent": "^1.8.3"

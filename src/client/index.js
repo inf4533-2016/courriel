@@ -1,16 +1,25 @@
-var $ = require('jquery');
-var ld = require('lodash');
-var NodeRSA = require('node-rsa');
-var CryptoJS = require('crypto-js');
+var $          = require('jquery');
+var ld         = require('lodash');
+var NodeRSA    = require('node-rsa');
+var CryptoJS   = require('crypto-js');
 var superagent = require('superagent');
 
 var $header = $('#header');
-var $focus = $('#focus'); 
+var $focus = $('#focus');
 var $body = $('#body');
 
 var key = null;
 var etat = null;
 
+var readMessage = function( msg ) {
+    var resultat = null;
+    try {
+        resultat = key.decrypt(msg, 'utf8');
+    } catch (e) {
+        console.warn("Problem: " + e);
+    }
+    return resultat;
+}
 
 var addAddress = function() {
     var name = prompt("Name");
@@ -74,7 +83,8 @@ superagent
             if (ld.isEmpty(etat.encryptedKey)) {
                 key = new NodeRSA({b: 512});
                 password = prompt("New pass phrase");
-                etat.encryptedKey = CryptoJS.AES.encrypt(key.exportKey(), password).toString();
+                etat.encryptedKey = CryptoJS.AES.encrypt(key.exportKey(), password)
+                    .toString();
                 superagent
                     .post("/storeEncryptedKey")
                     .send({encryptedKey: etat.encryptedKey} )
@@ -84,7 +94,8 @@ superagent
                     var pem = null;
                     try {
                         password = prompt("Your pass phrase");
-                        pem = CryptoJS.AES.decrypt(etat.encryptedKey, password).toString(CryptoJS.enc.Utf8);
+                        pem = CryptoJS.AES.decrypt(etat.encryptedKey, password)
+                            .toString(CryptoJS.enc.Utf8);
                         key = new NodeRSA(pem);
                         break;
                     } catch (e) {

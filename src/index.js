@@ -20,6 +20,7 @@ app.get("/", function(req,res) {
 });
 
 app.post("/storeEncryptedKey", body_parse.json(), function(req,res) {
+    console.log(req.body.encryptedKey);
     etat.encryptedKey = req.body.encryptedKey;
     res.json("ok");
 });

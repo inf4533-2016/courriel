@@ -1,18 +1,17 @@
 var $          = require('jquery');
-var ld         = require('lodash');
 var NodeRSA    = require('node-rsa');
 var CryptoJS   = require('crypto-js');
 var superagent = require('superagent');
 
-var $header = $('#header');
 var $focus = $('#focus');
-var $body = $('#body');
+var $body  = $('#body');
 
 var key = null;
 var etat = null;
+var decryptedLetters = [];
 
-var readMessage = function( msg ) {
-    var resultat = null;
+var decryptMessage = function( msg ) {
+    var resultat = "Failed to decrypt";
     try {
         resultat = key.decrypt(msg, 'utf8');
     } catch (e) {
@@ -21,23 +20,45 @@ var readMessage = function( msg ) {
     return resultat;
 }
 
-var addAddress = function() {
-    var name = prompt("Name");
-    var pem = prompt("Public key");
-    if (ld.isEmpty(pem)) {
+var populateDecryptedLetters = function() {
+    myPublicKey = key.exportKey('public');
+    decryptedLetters = [];
+    etat.letters.forEach( function( letter ) {
+        if (letter.to == myPublicKey) {
+            decryptedLetters.push( {
+                date: letter.date,
+                msg: decryptMessage(letter.msg)
+            });
+        }
+    });
+};
+var reload = function( cb ) {
+    if (! cb )
+        cb = function(){};
+    superagent
+        .get("/etat")
+        .send()
+        .end( function(err, res) {
+            if (err) return cb(err);
+            etat = res.body;
+            cb(null);
+        });
+}
+
+var addAddress = function(name, pem) {
+    // var pem = prompt("Public key");
+    if (! pem ) {
         var randomKey = new NodeRSA({b: 512});
         pem = randomKey.exportKey('public');
     }
-    etat.yp[pem] = {name: name};
+    etat.yp[pem] = {name: name, pem: pem};
     superagent
         .post("/addAddress")
         .send({pem:pem, name:name})
         .end(console.log.bind(console));
 };
 
-var newMessage = function($textarea) {
-    var text = $textarea.val();
-    var address = Object.keys(etat.yp)[0];
+var newMessage = function(text, address) {
     var pubKey = new NodeRSA(address);
     var msg = {date:new Date(), to: address, msg: pubKey.encrypt(text,'base64')};
     console.log(JSON.stringify(msg, null, 2));
@@ -49,21 +70,43 @@ var newMessage = function($textarea) {
 
 var redraw_view = function() {
     var $content;
-    var $newAddress;
-    var $newMessage;
-    var $textarea;
     switch($focus.val()) {
     case "inbox" :
-        $content =  ["List of messages..."];
+        var $list = $('<ul>');
+        decryptedLetters.forEach( function(letter) {
+            $list.append($('<li>').append(
+                $('<a href="#">').append("Date: "+letter.date).click(function(){
+                    alert("Sent: "+letter.date+"\n\n"+ letter.msg);
+                }))
+            );
+        });
+        var $reload = $('<button>').append("Reload")
+            .click(function(){ reload( populateDecryptedLetters ) });
+        $content =  [$list, $reload];
         break;
     case "write" :
-        $textarea = $('<textarea>');
-        $newMessage = $('<button>').append("New Message").click(newMessage.bind(null, $textarea) );
+        var $textarea = $('<textarea>');
+        var $newMessage = $('<button>').append("New Message")
+            .click(function(){
+                newMessage($textarea.val(), key.exportKey('public'));
+                $textarea.val("");
+                reload( populateDecryptedLetters );
+            } );
         $content = [ "Compose a new message...", $textarea, $newMessage ];
         break;
     case "yp" :
-        $newAddress = $('<button>').append("New Address").click(addAddress);
-        $content =  ["Address book...", $newAddress ];
+        var $list = $('<ul>');
+        Object.keys(etat.yp).forEach( function(pem) {
+            var entry = etat.yp[pem];
+            $list.append($('<li>').append(
+                $('<a href="#">').append(entry.name).click(function(){
+                    alert(JSON.stringify(entry));
+                }))
+            );
+        });
+        var $newAddress = $('<button>').append("New Address")
+            .click(function(){ addAddress("user_" + Object.keys(etat.yp).length); redraw_view(); });
+        $content =  ["Address book...", $list, $newAddress ];
         break;
     };
     $body.empty().append($content);
@@ -71,39 +114,35 @@ var redraw_view = function() {
 
 $focus.change( redraw_view );
 
-superagent
-    .get("/etat")
-    .send()
-    .end( function(err, res) {
-        if (err) {
-            console.error(err);
-        } else {
-            etat = res.body;
-            var password = null;
-            if (ld.isEmpty(etat.encryptedKey)) {
-                key = new NodeRSA({b: 512});
-                password = prompt("New pass phrase");
-                etat.encryptedKey = CryptoJS.AES.encrypt(key.exportKey(), password)
-                    .toString();
-                superagent
-                    .post("/storeEncryptedKey")
-                    .send({encryptedKey: etat.encryptedKey} )
-                    .end(console.log.bind(console));
-            } else {
-                while (true) {
-                    var pem = null;
-                    try {
-                        password = prompt("Your pass phrase");
-                        pem = CryptoJS.AES.decrypt(etat.encryptedKey, password)
-                            .toString(CryptoJS.enc.Utf8);
-                        key = new NodeRSA(pem);
-                        break;
-                    } catch (e) {
-                        alert("Try again...");
-                    }
-                }
-            }
-            console.log(key.exportKey());
-        };
-        redraw_view();
-    });
+
+reload( function(err) {
+    if (err) return console.error(err);
+    if (! etat.encryptedKey) {
+        // we do not have our key yet
+        key = new NodeRSA({b: 512});
+        password = prompt("New password");
+        etat.encryptedKey = CryptoJS.AES.encrypt(key.exportKey(), password)
+            .toString();
+        superagent
+            .post("/storeEncryptedKey")
+            .send({encryptedKey: etat.encryptedKey})
+            .end(console.log.bind(console));
+        // add my public key to the yp
+        addAddress("me", key.exportKey('public'));
+    } else while (true) {
+        var pem = null;
+        try {
+            password = prompt("Password check:");
+            pem = CryptoJS.AES.decrypt(etat.encryptedKey, password)
+                .toString(CryptoJS.enc.Utf8);
+            key = new NodeRSA(pem);
+            break;
+        } catch (e) {
+            alert("Try again...");
+        }
+    }
+
+    // build decrypted list of messages
+    populateDecryptedLetters();
+    redraw_view();
+});

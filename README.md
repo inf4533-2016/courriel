@@ -65,4 +65,30 @@ la valeur de l'`etat`;
 cryptographie asymétrique (RSA), pour garantir la confidentialité.
 
 
+### Structure de l'application
 
+L'application se trouve dans `src/`
+
+      .
+      ├── client/index.js     -  code pour navigateur (via `browserify` -> `public/js/courriel.js`)
+      ├── index.js    - code pour le serveur
+      ├── peers.js    - communication/synchronisation entre pairs
+      ├── node_modules/...
+      ├── package.json  -  description de dépendances de l'application
+      ├── public   -  les fichiers dans `public/*` sont accessible aux clients "as is"
+      │   ├── css/...
+      │   ├── images/...
+      │   └── js/...
+      └── views/courriel.jade - code `jade` pour la page `html` de l'application
+
+### Exécuter
+
+Faire:
+
+    > git clone https://github.com/inf4533-2016/courriel.git
+    > cd courriel/src
+    > npm install
+    > npm run build
+    > npm start
+
+Le URL du serveur est: http://localhost:8888/

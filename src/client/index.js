@@ -81,18 +81,25 @@ var redraw_view = function() {
             );
         });
         var $reload = $('<button>').append("Reload")
-            .click(function(){ reload( populateDecryptedLetters ) });
+            .click(function(){ reload( function() {
+              populateDecryptedLetters();
+              redraw_view();
+            }) });
         $content =  [$list, $reload];
         break;
     case "write" :
         var $textarea = $('<textarea>');
+        var $addresses = Object.keys(etat.yp).map( function( addr ) {
+          return $('<option value="'+addr+'">').append(etat.yp[addr].name);
+        });
+        var $to = $('<select>').append( $addresses );
         var $newMessage = $('<button>').append("New Message")
             .click(function(){
-                newMessage($textarea.val(), key.exportKey('public'));
+                newMessage($textarea.val(), $to.val());
                 $textarea.val("");
                 reload( populateDecryptedLetters );
             } );
-        $content = [ "Compose a new message...", $textarea, $newMessage ];
+        $content = [ "Compose a new message...", $to, $textarea, $newMessage ];
         break;
     case "yp" :
         var $list = $('<ul>');
@@ -120,6 +127,7 @@ reload( function(err) {
     if (! etat.encryptedKey) {
         // we do not have our key yet
         key = new NodeRSA({b: 512});
+        var name = prompt("My full name");
         password = prompt("New password");
         etat.encryptedKey = CryptoJS.AES.encrypt(key.exportKey(), password)
             .toString();
@@ -128,7 +136,7 @@ reload( function(err) {
             .send({encryptedKey: etat.encryptedKey})
             .end(console.log.bind(console));
         // add my public key to the yp
-        addAddress("me", key.exportKey('public'));
+        addAddress((name || "me"), key.exportKey('public'));
     } else while (true) {
         var pem = null;
         try {

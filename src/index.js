@@ -1,6 +1,7 @@
 var express = require("express");
 var body_parse  = require('body-parser');
 var json_file_object = require("json-file-object");
+var peers = require("./peers");
 
 var app = express();
 
@@ -12,6 +13,8 @@ var etat = json_file_object({
         letters: []
     }
 });
+
+peers(etat, ["http://localhost:8889/etat"], 15);
 
 app.locals.pretty = true;
 

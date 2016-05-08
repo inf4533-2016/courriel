@@ -9,10 +9,16 @@ var get_state = function( etat, url ) {
       if (err) return console.warn(err);
       var remoteEtat = data.body;
       etat.letters = ld.map( ld.assign( {},
-        ld.keyBy(remoteEtat.letters, "msg"),
-        ld.keyBy(etat.letters, "msg")
+        ld.keyBy(remoteEtat.letters, "msgTo"),
+        ld.keyBy(etat.letters, "msgTo")
+      ));
+	  
+	  etat.letters = ld.map( ld.assign( {},
+        ld.keyBy(remoteEtat.letters, "msgFrom"),
+        ld.keyBy(etat.letters, "msgFrom")
       ));
       etat.yp = ld.assign({}, remoteEtat.yp, etat.yp);
+	  //console.log(etat);
     });
 }
 

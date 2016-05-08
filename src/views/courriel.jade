@@ -1,18 +1,26 @@
 doctype html
 html
-  head
-    title Courriel
-    link(rel='stylesheet', href='/css/style.css')
-  body
-    div.header(id='header')
-      select(id="focus")
-        option(value="inbox") Inbox
-        option(value="write") New message
-        option(value="yp") Address Book
-    div.body(id='body')
-
-    script(src='/js/courriel.js')
-
-
-
-
+	head
+		title Mini-serveur HTTP, courriel
+		meta(name='author',content='Aline Landry, Ariella Sota, Arnaud Niyonkuru, Reagan Shuku, Vestine Mukeshimana')
+		link(rel='stylesheet',type='text/css',href='/css/courriel.css')
+	body
+		table(class='main-frame')
+			tr(class='top-row')
+				td(id='top-left-region')
+					a(id='compose-link', class='blue-theme',href='#') Compose
+				td(id='top-right-region')
+			tr
+				td(id='bottom-left-region')
+					table
+						tr
+							td
+								a(id='inbox-link', class='blue-theme',href='#') Inbox
+						tr
+							td
+								a(id='outbox-link', class='blue-theme',href='#') Outbox
+						tr
+							td
+								a(id='yp-link', class='blue-theme',href='#') Yellow Page
+				td(id='bottom-right-region')
+		script(src='/js/courriel.js')
